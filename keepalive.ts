@@ -31,7 +31,8 @@ async function login(username?: string, password?: string) {
 
 async function startupAndLogin(url: string) {
     const browser = await puppeteer.launch({
-        headless: false,
+        // headless: false,
+        headless: true,
         // args: ['--headless'],
     })
     page = await browser.newPage();

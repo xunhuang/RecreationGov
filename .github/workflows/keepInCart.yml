@@ -21,3 +21,6 @@ jobs:
           RECREATION_GOV_PASSWORD: ${{ secrets.RECREATION_GOV_PASSWORD }}
     - name: Setup tmate session
       uses: mxschmitt/action-tmate@master
+      env:
+          RECREATION_GOV_USERNAME: ${{ secrets.RECREATION_GOV_USERNAME }}
+          RECREATION_GOV_PASSWORD: ${{ secrets.RECREATION_GOV_PASSWORD }}
