@@ -111,6 +111,7 @@ async function keepItemInCart() {
         try {
             await page.waitForSelector('#show-summary-button', { timeout: 2000 });
             console.log("Time extended!....");
+            await page.waitForTimeout(2000);
             // delete the item and confirm.
             await page.click('section .sarsa-inline button');
             await page.waitForTimeout(2000);
@@ -120,13 +121,13 @@ async function keepItemInCart() {
             if (e instanceof puppeteer.errors.TimeoutError) {
                 console.log("clicked the add to cart too late, close the modal dialog and try again");
                 await page.click('.ReactModalPortal button');
-                throw e;
             }
+            throw e;
         }
     }
 }
 
-const iterations = 3;
+const iterations = 30;
 
 (async () => {
     await startupAndLogin(entryURL.dino);
@@ -135,6 +136,8 @@ const iterations = 3;
             await keepItemInCart();
             await page.waitForTimeout(3 * 60 * 1000); // 3 minutes between runs
         } catch (e) {
+            console.log("other exception")
+            console.log(e);
             await page.waitForTimeout(10000);
         }
     }
