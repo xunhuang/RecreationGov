@@ -1,0 +1,20 @@
+name: linux
+on: 
+  workflow_dispatch:
+defaults:
+  run:
+    shell: bash
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+          # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - uses: actions/checkout@v2
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+          node-version: ${{ matrix.node-version }}
+    - run: npm ci
+    - run: npx ts-node keepalive.ts
+    - name: Setup tmate session
+      uses: mxschmitt/action-tmate@master

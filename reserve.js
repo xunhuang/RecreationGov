@@ -198,7 +198,6 @@ async function getParkAvailableTimeslots(url, date, space, acceptableTimes) {
       case State.NEW:
         await startupAndLogin(url);
         state = State.LOGGEDIN;
-        // state = State.ITEM_IN_CART;
         break;
       case State.LOGGEDIN:
         state = await selectDateToMakeSureItsOK(url, date) ? State.DATE_AVAIL_OR_NR : State.LOGGEDIN;
