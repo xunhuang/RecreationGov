@@ -1,4 +1,3 @@
-import { Page, Puppeteer } from "puppeteer";
 
 const puppeteer = require('puppeteer');
 const moment = require("moment");
@@ -127,11 +126,10 @@ async function keepItemInCart() {
     }
 }
 
-const iterations = 30;
 
 (async () => {
     await startupAndLogin(entryURL.dino);
-    for (let i = 0; i < iterations; i++) {
+    while (1) {
         try {
             await keepItemInCart();
             await page.waitForTimeout(3 * 60 * 1000); // 3 minutes between runs

@@ -1,6 +1,9 @@
 name: keepalive
 on: 
   workflow_dispatch:
+  schedule:
+    # every 5 hours...
+    - cron: "0 0 */5 * * *"
 defaults:
   run:
     shell: bash
