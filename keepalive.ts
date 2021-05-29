@@ -1,6 +1,6 @@
 
-const puppeteer = require('puppeteer');
-const moment = require("moment");
+import puppeteer = require('puppeteer');
+import moment = require("moment");
 
 const USERNAME = process.env.RECREATION_GOV_USERNAME;
 const PASSWORD = process.env.RECREATION_GOV_PASSWORD;

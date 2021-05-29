@@ -18,12 +18,7 @@ jobs:
       with:
           node-version: ${{ matrix.node-version }}
     - run: npm ci
-    - run: npx ts-node keepalive.ts
-      env:
-          RECREATION_GOV_USERNAME: ${{ secrets.RECREATION_GOV_USERNAME }}
-          RECREATION_GOV_PASSWORD: ${{ secrets.RECREATION_GOV_PASSWORD }}
-    - name: Setup tmate session
-      uses: mxschmitt/action-tmate@master
+    - run: npx ts-node v2-keepalive.ts
       env:
           RECREATION_GOV_USERNAME: ${{ secrets.RECREATION_GOV_USERNAME }}
           RECREATION_GOV_PASSWORD: ${{ secrets.RECREATION_GOV_PASSWORD }}
