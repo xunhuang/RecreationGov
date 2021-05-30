@@ -36,8 +36,16 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.api_login = void 0;
+exports.login = void 0;
 var fetch = require('node-fetch');
+var USERNAME = process.env.RECREATION_GOV_USERNAME;
+var PASSWORD = process.env.RECREATION_GOV_PASSWORD;
+if (!USERNAME || !PASSWORD) {
+    console.log("set your recreation.gov user name and password with environment variable ");
+    console.log("export RECREATION_GOV_USERNAME=blah");
+    console.log("export RECREATION_GOV_PASSWORD=blah");
+    process.exit(-1);
+}
 var AccountInfo = /** @class */ (function () {
     function AccountInfo(accessToken, email, accountId, expiration) {
         this.accessToken = accessToken;
@@ -83,7 +91,6 @@ function api_login(username, password) {
                         throw "Login error";
                     }
                     account = new AccountInfo(res.access_token, res.account.email, res.account.account_id, res.expiration);
-                    // console.log(account);
                     return [2 /*return*/, account];
                 case 3:
                     e_1 = _a.sent();
@@ -94,6 +101,16 @@ function api_login(username, password) {
         });
     });
 }
-exports.api_login = api_login;
 ;
+function login() {
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, api_login(USERNAME, PASSWORD)];
+                case 1: return [2 /*return*/, _a.sent()];
+            }
+        });
+    });
+}
+exports.login = login;
 //# sourceMappingURL=login.js.map

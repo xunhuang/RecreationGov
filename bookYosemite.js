@@ -36,20 +36,74 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.bookYosemite = void 0;
+function bookYosemite(username, accessToken, date) {
+    return __awaiter(this, void 0, void 0, function () {
+        var body, response, res;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    body = {
+                        "reservation": {
+                            "facility_id": "10086745",
+                            "tour_id": "10086746",
+                            "status": "DRAFT",
+                            "tour_date": date,
+                            "tour_time": "0500",
+                            "ticket_count_by_guest_type_id": {
+                                "10086745_vehicle_7day_entry": 1
+                            },
+                            "passes_by_guest_type_id": {},
+                            "user_email": username,
+                        },
+                        "reservationoptions": {
+                            "targetstatus": "HOLD"
+                        },
+                        "system": {
+                            "section": "timedEntryTicketDetailsPage",
+                            "code": "03AGdBq25_oW9YHwX0ZN9A1oJKPzMrm0UMsvqlxrAv5erDOxqT3SPYOCRSDG3cr0HyuUjFOPN1-XIwwXxso1TUIaSgYLj8p2nEjl6sRFSosAcGrjvnX9j6wYZD_a8OZjmmCH9KOL2biccmvz72WZuC8cSeEiNPRrDgVQgtfdvmUip2G8ddh4qLLuInf2eq8PO-Kt49cdN73AV_1pX9ySMqDkqmI40dCGtSlzCbhtPOlVbPenxCQ5VDMzLOkjM3eJmJ985A52AKxkqf_A2HY-FAhpcEAIelHJwHCZLshd_xigYCw8XCRyrslwKD9ylA8x2OLkOstFkaPuD26yhOHbjVSg9dTDJdpWieLS-0cITd4-yEWvcpBWenPnsbImjbH8MEDC-YbVdTxSZDgt-HtbTvSzu-2hHXIf9VNys4TSiDuBJ68nAKyAIT1dZ7J8UY4Vhn3tgQEvN8LISZ9V1J8PBOaP_cuLwBZmIghNQkH3gYouv64bf8XL-uE7o",
+                            "region": "EAST"
+                        }
+                    };
+                    return [4 /*yield*/, fetch("https://www.recreation.gov/api/ticket/reservation", {
+                            "headers": {
+                                "accept": "application/json, text/plain, */*",
+                                "accept-language": "en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7",
+                                "authorization": "Bearer " + accessToken,
+                                "cache-control": "no-cache, no-store, must-revalidate",
+                                "content-type": "application/json;charset=UTF-8",
+                                "pragma": "no-cache",
+                                "sec-ch-ua": "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"90\", \"Google Chrome\";v=\"90\"",
+                                "sec-ch-ua-mobile": "?0",
+                                "sec-fetch-dest": "empty",
+                                "sec-fetch-mode": "cors",
+                                "sec-fetch-site": "same-origin",
+                            },
+                            "referrer": "https://www.recreation.gov/timed-entry/10086745/ticket/10086746",
+                            "referrerPolicy": "strict-origin-when-cross-origin",
+                            "body": JSON.stringify(body),
+                            "method": "POST",
+                            "mode": "cors"
+                        })];
+                case 1:
+                    response = _a.sent();
+                    return [4 /*yield*/, response.json()];
+                case 2:
+                    res = _a.sent();
+                    console.log(res);
+                    if (res.error) {
+                        throw "Reservation error";
+                    }
+                    return [2 /*return*/, false];
+            }
+        });
+    });
+}
+exports.bookYosemite = bookYosemite;
 (function () { return __awaiter(void 0, void 0, void 0, function () {
-    var sleep_between_runs, USERNAME, PASSWORD, a;
+    var sleep_between_runs;
     return __generator(this, function (_a) {
         sleep_between_runs = 10 * 60 * 1000;
-        USERNAME = process.env.RECREATION_GOV_USERNAME;
-        PASSWORD = process.env.RECREATION_GOV_PASSWORD;
-        if (!USERNAME || !PASSWORD) {
-            console.log("set your recreation.gov user name and password with environment variable ");
-            console.log("export RECREATION_GOV_USERNAME=blah");
-            console.log("export RECREATION_GOV_PASSWORD=blah");
-            process.exit(-1);
-        }
-        a = "{\"reservation\":{\"facility_id\":\"10086745\",\"tour_id\":\"10086746\",\"status\":\"DRAFT\",\"tour_date\":\"2021-08-13\",\"tour_time\":\"0500\",\"ticket_count_by_guest_type_id\":{\"10086745_vehicle_7day_entry\":1},\"passes_by_guest_type_id\":{},\"user_email\":\"xhuang@gmail.com\"},\"reservationoptions\":{\"targetstatus\":\"HOLD\"},\"system\":{\"section\":\"timedEntryTicketDetailsPage\",\"code\":\"03AGdBq25_oW9YHwX0ZN9A1oJKPzMrm0UMsvqlxrAv5erDOxqT3SPYOCRSDG3cr0HyuUjFOPN1-XIwwXxso1TUIaSgYLj8p2nEjl6sRFSosAcGrjvnX9j6wYZD_a8OZjmmCH9KOL2biccmvz72WZuC8cSeEiNPRrDgVQgtfdvmUip2G8ddh4qLLuInf2eq8PO-Kt49cdN73AV_1pX9ySMqDkqmI40dCGtSlzCbhtPOlVbPenxCQ5VDMzLOkjM3eJmJ985A52AKxkqf_A2HY-FAhpcEAIelHJwHCZLshd_xigYCw8XCRyrslwKD9ylA8x2OLkOstFkaPuD26yhOHbjVSg9dTDJdpWieLS-0cITd4-yEWvcpBWenPnsbImjbH8MEDC-YbVdTxSZDgt-HtbTvSzu-2hHXIf9VNys4TSiDuBJ68nAKyAIT1dZ7J8UY4Vhn3tgQEvN8LISZ9V1J8PBOaP_cuLwBZmIghNQkH3gYouv64bf8XL-uE7o\",\"region\":\"EAST\"}}";
-        console.log(JSON.stringify(JSON.parse(a), null, 2));
         return [2 /*return*/];
     });
 }); })();

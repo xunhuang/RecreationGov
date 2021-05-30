@@ -40,20 +40,12 @@ var moment = require("moment");
 var login_1 = require("./login");
 var makeReservation_1 = require("./makeReservation");
 (function () { return __awaiter(void 0, void 0, void 0, function () {
-    var sleep_between_runs, USERNAME, PASSWORD, account, reservation, e_1;
+    var sleep_between_runs, account, reservation, e_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 sleep_between_runs = 10 * 60 * 1000;
-                USERNAME = process.env.RECREATION_GOV_USERNAME;
-                PASSWORD = process.env.RECREATION_GOV_PASSWORD;
-                if (!USERNAME || !PASSWORD) {
-                    console.log("set your recreation.gov user name and password with environment variable ");
-                    console.log("export RECREATION_GOV_USERNAME=blah");
-                    console.log("export RECREATION_GOV_PASSWORD=blah");
-                    process.exit(-1);
-                }
-                return [4 /*yield*/, login_1.api_login(USERNAME, PASSWORD)];
+                return [4 /*yield*/, login_1.login()];
             case 1:
                 account = _a.sent();
                 _a.label = 2;

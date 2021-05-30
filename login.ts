@@ -1,6 +1,16 @@
 
 const fetch = require('node-fetch');
 
+const USERNAME = process.env.RECREATION_GOV_USERNAME;
+const PASSWORD = process.env.RECREATION_GOV_PASSWORD;
+
+if (!USERNAME || !PASSWORD) {
+    console.log("set your recreation.gov user name and password with environment variable ");
+    console.log("export RECREATION_GOV_USERNAME=blah");
+    console.log("export RECREATION_GOV_PASSWORD=blah");
+    process.exit(-1);
+}
+
 class AccountInfo {
     public accessToken: string;
     public email: string;
@@ -19,7 +29,7 @@ class AccountInfo {
     }
 };
 
-export async function api_login(username: string, password: string): Promise<AccountInfo | null> {
+async function api_login(username: string, password: string): Promise<AccountInfo | null> {
     try {
         let response = await fetch("https://www.recreation.gov/api/accounts/login", {
             "headers": {
@@ -50,7 +60,6 @@ export async function api_login(username: string, password: string): Promise<Acc
             res.account.account_id,
             res.expiration,
         );
-        // console.log(account);
         return account;
     } catch (e) {
         console.log(e);
@@ -58,3 +67,6 @@ export async function api_login(username: string, password: string): Promise<Acc
     }
 };
 
+export async function login(): Promise<AccountInfo | null> {
+    return await api_login(USERNAME, PASSWORD);
+}
