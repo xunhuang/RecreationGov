@@ -48,6 +48,7 @@ if (!USERNAME || !PASSWORD) {
     console.log("export RECREATION_GOV_PASSWORD=blah");
     process.exit(-1);
 }
+var CacheFilename = '.account.json';
 var AccountInfo = /** @class */ (function () {
     function AccountInfo(data) {
         Object.assign(this, data);
@@ -64,11 +65,11 @@ var AccountInfo = /** @class */ (function () {
     AccountInfo.prototype.persistToFileSystem = function () {
         var data = Object.assign({}, this);
         var jsondata = JSON.stringify(data);
-        fs.writeFileSync('.account.json', jsondata);
+        fs.writeFileSync(CacheFilename, jsondata);
     };
     AccountInfo.factory_from_cache = function () {
         try {
-            var rawdata = fs.readFileSync('.account.json', 'utf8');
+            var rawdata = fs.readFileSync(CacheFilename, 'utf8');
             var data = JSON.parse(rawdata);
             return new AccountInfo(data);
         }
@@ -135,7 +136,7 @@ function login() {
                     account = AccountInfo.factory_from_cache();
                     if (account) {
                         console.log("got account from cache");
-                        if (moment().add(6, "hours").isBefore(moment(account.expiration))) {
+                        if (moment().add(3, "hours").isBefore(moment(account.expiration))) {
                             return [2 /*return*/, account];
                         }
                         console.log("cache expired");
@@ -147,7 +148,6 @@ function login() {
                         console.log("persisting new login to file");
                         account.persistToFileSystem();
                     }
-                    // console.log(account);
                     return [2 /*return*/, account];
             }
         });

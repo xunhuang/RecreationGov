@@ -1,12 +1,12 @@
 
-
-const fetch = require('node-fetch');
-
-(async () => {
-    let a = await fetch("https://www.recreation.gov/api/cart/shoppingcart/header", {
+import fetch from 'node-fetch';
+export async function shopperCart(accessToken: string): Promise<Object | null> {
+    // let a = await fetch("https://www.recreation.gov/api/cart/shoppingcart/header", {
+    let a = await fetch("https://www.recreation.gov/api/cart/shoppingcart", {
         "headers": {
             "accept": "application/json, text/plain, */*",
             "accept-language": "en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7",
+            "authorization": `Bearer ${accessToken}`,
             "cache-control": "no-cache, no-store, must-revalidate",
             "pragma": "no-cache",
             "sec-ch-ua": "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"90\", \"Google Chrome\";v=\"90\"",
@@ -21,8 +21,7 @@ const fetch = require('node-fetch');
         "method": "GET",
         "mode": "cors"
     });
-    json = await a.json();
-    console.log(json);
-    console.log("xxx");
-
-})();
+    let json = await a.json();
+    // console.log(json);
+    return json;
+}

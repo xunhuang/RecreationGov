@@ -13,6 +13,8 @@ if (!USERNAME || !PASSWORD) {
     process.exit(-1);
 }
 
+const CacheFilename = '.account.json';
+
 class AccountInfo {
     public accessToken: string;
     public email: string;
@@ -41,12 +43,12 @@ class AccountInfo {
     persistToFileSystem() {
         let data = Object.assign({}, this);
         let jsondata = JSON.stringify(data);
-        fs.writeFileSync('.account.json', jsondata);
+        fs.writeFileSync(CacheFilename, jsondata);
     }
 
     static factory_from_cache(): AccountInfo | null {
         try {
-            let rawdata = fs.readFileSync('.account.json', 'utf8');
+            let rawdata = fs.readFileSync(CacheFilename, 'utf8');
             let data = JSON.parse(rawdata);
             return new AccountInfo(data);
         } catch (e) {
@@ -98,7 +100,7 @@ export async function login(): Promise<AccountInfo | null> {
     let account = AccountInfo.factory_from_cache();
     if (account) {
         console.log("got account from cache");
-        if (moment().add(6, "hours").isBefore(moment(account.expiration))) {
+        if (moment().add(3, "hours").isBefore(moment(account.expiration))) {
             return account;
         }
         console.log("cache expired");
@@ -108,6 +110,5 @@ export async function login(): Promise<AccountInfo | null> {
         console.log("persisting new login to file");
         account.persistToFileSystem();
     }
-    // console.log(account);
     return account;
 }
