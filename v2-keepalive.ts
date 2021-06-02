@@ -5,8 +5,8 @@ import { api_placer_holder, cancel_reservation } from "./makeReservation";
 
 (async () => {
     let sleep_between_runs = 10 * 60 * 1000; // 10 minutes;
-    let account = await login();
     while (1) {
+        let account = await login();
         console.log(moment().format() + ": resetting cart expiration ");
         try {
             let reservation = await api_placer_holder(account.email, account.accessToken);

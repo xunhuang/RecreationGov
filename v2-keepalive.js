@@ -45,12 +45,12 @@ var makeReservation_1 = require("./makeReservation");
         switch (_a.label) {
             case 0:
                 sleep_between_runs = 10 * 60 * 1000;
-                return [4 /*yield*/, login_1.login()];
+                _a.label = 1;
             case 1:
-                account = _a.sent();
-                _a.label = 2;
-            case 2:
                 if (!1) return [3 /*break*/, 10];
+                return [4 /*yield*/, login_1.login()];
+            case 2:
+                account = _a.sent();
                 console.log(moment().format() + ": resetting cart expiration ");
                 _a.label = 3;
             case 3:
@@ -77,7 +77,7 @@ var makeReservation_1 = require("./makeReservation");
                 // eat the error and try again in 10 seconds
                 _a.sent();
                 return [3 /*break*/, 9];
-            case 9: return [3 /*break*/, 2];
+            case 9: return [3 /*break*/, 1];
             case 10: return [2 /*return*/];
         }
     });
