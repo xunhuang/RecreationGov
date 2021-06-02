@@ -36,7 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.cancel_reservation = exports.api_placer_holder = void 0;
+exports.cancel_reservation = exports.book_temporary_reservation = void 0;
 var moment = require("moment");
 var fetch = require("node-fetch");
 var ReservationResponse = /** @class */ (function () {
@@ -53,7 +53,7 @@ var CancellationResponse = /** @class */ (function () {
     return CancellationResponse;
 }());
 ;
-function api_placer_holder(username, accessToken) {
+function book_temporary_reservation(username, accessToken) {
     return __awaiter(this, void 0, void 0, function () {
         var body, response, res, info, e_1;
         return __generator(this, function (_a) {
@@ -116,7 +116,7 @@ function api_placer_holder(username, accessToken) {
         });
     });
 }
-exports.api_placer_holder = api_placer_holder;
+exports.book_temporary_reservation = book_temporary_reservation;
 ;
 function cancel_reservation(reserationId, accessToken) {
     return __awaiter(this, void 0, void 0, function () {

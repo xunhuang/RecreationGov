@@ -1,7 +1,7 @@
 
 import moment = require("moment");
 import { login } from "./login";
-import { api_placer_holder, cancel_reservation } from "./makeReservation";
+import { book_temporary_reservation, cancel_reservation } from "./makeReservation";
 import { shopperCart } from "./cartHeader"
 
 (async () => {
@@ -15,7 +15,7 @@ import { shopperCart } from "./cartHeader"
             console.log(moment().format() + ": trying to reset cart expiration ");
             if (cart && cart["reservations"] && cart["reservations"].length > 0) {
                 // with reservations, let's try to keep it.
-                let reservation = await api_placer_holder(account.email, account.accessToken);
+                let reservation = await book_temporary_reservation(account.email, account.accessToken);
                 if (!reservation) {
                     throw "reservation not made, not good";
                 }

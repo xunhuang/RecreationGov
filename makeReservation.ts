@@ -16,7 +16,7 @@ class CancellationResponse {
     }
 };
 
-export async function api_placer_holder(username: string, accessToken: string): Promise<ReservationResponse | null> {
+export async function book_temporary_reservation(username: string, accessToken: string): Promise<ReservationResponse | null> {
     try {
         let body = {
             reservation:

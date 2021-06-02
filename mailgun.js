@@ -36,57 +36,39 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var moment = require("moment");
-var login_1 = require("./login");
-var makeReservation_1 = require("./makeReservation");
-var cartHeader_1 = require("./cartHeader");
-(function () { return __awaiter(void 0, void 0, void 0, function () {
-    var sleep_between_runs, account, cart, reservation, e_1;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                sleep_between_runs = 10 * 60 * 1000;
-                _a.label = 1;
-            case 1:
-                if (!1) return [3 /*break*/, 12];
-                return [4 /*yield*/, login_1.login()];
-            case 2:
-                account = _a.sent();
-                _a.label = 3;
-            case 3:
-                _a.trys.push([3, 9, , 11]);
-                return [4 /*yield*/, cartHeader_1.shopperCart(account.accessToken)];
-            case 4:
-                cart = _a.sent();
-                console.log(cart);
-                console.log(moment().format() + ": trying to reset cart expiration ");
-                if (!(cart && cart["reservations"] && cart["reservations"].length > 0)) return [3 /*break*/, 7];
-                return [4 /*yield*/, makeReservation_1.book_temporary_reservation(account.email, account.accessToken)];
-            case 5:
-                reservation = _a.sent();
-                if (!reservation) {
-                    throw "reservation not made, not good";
-                }
-                return [4 /*yield*/, makeReservation_1.cancel_reservation(reservation.reservationId, account.accessToken)];
-            case 6:
-                _a.sent();
-                _a.label = 7;
-            case 7: return [4 /*yield*/, new Promise(function (r) { return setTimeout(r, sleep_between_runs); })];
-            case 8:
-                _a.sent();
-                return [3 /*break*/, 11];
-            case 9:
-                e_1 = _a.sent();
-                console.log(e_1);
-                // eat the error and try again in 10 seconds
-                return [4 /*yield*/, new Promise(function (r) { return setTimeout(r, 10 * 1000); })];
-            case 10:
-                // eat the error and try again in 10 seconds
-                _a.sent();
-                return [3 /*break*/, 11];
-            case 11: return [3 /*break*/, 1];
-            case 12: return [2 /*return*/];
-        }
+exports.send = void 0;
+function send(emails, subject, html) {
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            return [2 /*return*/, new Promise(function (resolve, reject) {
+                    var API_KEY = process.env.MAILGUN_TOKEN;
+                    var DOMAIN = 'yumyum.today';
+                    if (emails.length == 0) {
+                        console.log("Empty to: fields. No email sent");
+                        return;
+                    }
+                    var mailgun = require('mailgun-js')({ apiKey: API_KEY, domain: DOMAIN });
+                    var data = {
+                        from: 'YumYum Mailer<mail@yumyum.today>',
+                        to: emails.join(","),
+                        subject: subject,
+                        html: html
+                    };
+                    mailgun.messages().send(data, function (error, body) {
+                        if (error) {
+                            console.log("error is " + error);
+                            console.log(emails);
+                            console.log(emails.join(","));
+                            resolve(false); // or use rejcet(false) but then you will have to handle errors
+                        }
+                        else {
+                            console.log("Email sent to " + emails.join(","));
+                            resolve(true);
+                        }
+                    });
+                })];
+        });
     });
-}); })();
-//# sourceMappingURL=v2-keepalive.js.map
+}
+exports.send = send;
+//# sourceMappingURL=mailgun.js.map

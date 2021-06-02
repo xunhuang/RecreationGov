@@ -1,7 +1,8 @@
 
 import moment = require("moment");
 import { login } from "./login";
-import { api_placer_holder, cancel_reservation } from "./makeReservation";
+import fetch = require('node-fetch');
+import { send } from "./mailgun";
 
 export async function bookYosemite(username: string, accessToken: string, date: string): Promise<boolean> {
     let body = {
@@ -22,11 +23,13 @@ export async function bookYosemite(username: string, accessToken: string, date: 
         },
         "system": {
             "section": "timedEntryTicketDetailsPage",
-            "code": "03AGdBq25_oW9YHwX0ZN9A1oJKPzMrm0UMsvqlxrAv5erDOxqT3SPYOCRSDG3cr0HyuUjFOPN1-XIwwXxso1TUIaSgYLj8p2nEjl6sRFSosAcGrjvnX9j6wYZD_a8OZjmmCH9KOL2biccmvz72WZuC8cSeEiNPRrDgVQgtfdvmUip2G8ddh4qLLuInf2eq8PO-Kt49cdN73AV_1pX9ySMqDkqmI40dCGtSlzCbhtPOlVbPenxCQ5VDMzLOkjM3eJmJ985A52AKxkqf_A2HY-FAhpcEAIelHJwHCZLshd_xigYCw8XCRyrslwKD9ylA8x2OLkOstFkaPuD26yhOHbjVSg9dTDJdpWieLS-0cITd4-yEWvcpBWenPnsbImjbH8MEDC-YbVdTxSZDgt-HtbTvSzu-2hHXIf9VNys4TSiDuBJ68nAKyAIT1dZ7J8UY4Vhn3tgQEvN8LISZ9V1J8PBOaP_cuLwBZmIghNQkH3gYouv64bf8XL-uE7o",
             "region": "EAST"
         }
     };
-    let response = await fetch("https://www.recreation.gov/api/ticket/reservation", {
+
+    let bodystr = JSON.stringify(body);
+
+    let response = await fetch("https://www.recreation.gov/api/timedentry/reservation", {
         "headers": {
             "accept": "application/json, text/plain, */*",
             "accept-language": "en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7",
@@ -42,33 +45,41 @@ export async function bookYosemite(username: string, accessToken: string, date: 
         },
         "referrer": "https://www.recreation.gov/timed-entry/10086745/ticket/10086746",
         "referrerPolicy": "strict-origin-when-cross-origin",
-        "body": JSON.stringify(body),
+        "body": bodystr,
         "method": "POST",
         "mode": "cors"
     });
     let res = await response.json();
     console.log(res);
     if (res.error) {
-        throw "Reservation error";
+        console.log(`Reservation error : ${res.error}`);
+        return false;
     }
-    return false;
+    return true;;
 }
 
 (async () => {
-    let sleep_between_runs = 10 * 60 * 1000; // 10 minutes;
-    // let sleep_between_runs = 5 * 1000; 
-
-    /*
-    let account = await login();
- 
+    let date = process.argv[2];
+    let sleep_between_runs = 15000; // 15 second
     while (1) {
-        console.log(moment().format() + ": resetting cart expiration ");
+        let account = await login();
         try {
-            let reservation = await api_placer_holder(account.email, account.accessToken);
-            if (!reservation) {
-                throw "reservation not made, not good";
+            let reservation = await bookYosemite(
+                account.email,
+                account.accessToken,
+                date,
+            );
+            if (reservation) {
+                console.log('******* reservation made;')
+
+                await send(
+                    ["xhuang@gmail.com"],
+                    `${date} Yosemite reservation is added to chart!`,
+                    "Check your chart at: https://www.recreation.gov/ and checkout ASAP.")
+
+                process.exit(0);
             }
-            await cancel_reservation(reservation.reservationId, account.accessToken);
+            console.log(`.....  no reservation made, try again in ${sleep_between_runs / 1000} seconds`);
             await new Promise(r => setTimeout(r, sleep_between_runs));
         } catch (e) {
             console.log(e);
@@ -76,6 +87,4 @@ export async function bookYosemite(username: string, accessToken: string, date: 
             await new Promise(r => setTimeout(r, 10 * 1000));
         }
     }
-    */
-
 })();

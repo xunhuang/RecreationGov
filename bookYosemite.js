@@ -37,9 +37,11 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.bookYosemite = void 0;
+var fetch = require("node-fetch");
+var mailgun_1 = require("./mailgun");
 function bookYosemite(username, accessToken, date) {
     return __awaiter(this, void 0, void 0, function () {
-        var body, response, res;
+        var body, bodystr, response, res;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -61,11 +63,11 @@ function bookYosemite(username, accessToken, date) {
                         },
                         "system": {
                             "section": "timedEntryTicketDetailsPage",
-                            "code": "03AGdBq25_oW9YHwX0ZN9A1oJKPzMrm0UMsvqlxrAv5erDOxqT3SPYOCRSDG3cr0HyuUjFOPN1-XIwwXxso1TUIaSgYLj8p2nEjl6sRFSosAcGrjvnX9j6wYZD_a8OZjmmCH9KOL2biccmvz72WZuC8cSeEiNPRrDgVQgtfdvmUip2G8ddh4qLLuInf2eq8PO-Kt49cdN73AV_1pX9ySMqDkqmI40dCGtSlzCbhtPOlVbPenxCQ5VDMzLOkjM3eJmJ985A52AKxkqf_A2HY-FAhpcEAIelHJwHCZLshd_xigYCw8XCRyrslwKD9ylA8x2OLkOstFkaPuD26yhOHbjVSg9dTDJdpWieLS-0cITd4-yEWvcpBWenPnsbImjbH8MEDC-YbVdTxSZDgt-HtbTvSzu-2hHXIf9VNys4TSiDuBJ68nAKyAIT1dZ7J8UY4Vhn3tgQEvN8LISZ9V1J8PBOaP_cuLwBZmIghNQkH3gYouv64bf8XL-uE7o",
                             "region": "EAST"
                         }
                     };
-                    return [4 /*yield*/, fetch("https://www.recreation.gov/api/ticket/reservation", {
+                    bodystr = JSON.stringify(body);
+                    return [4 /*yield*/, fetch("https://www.recreation.gov/api/timedentry/reservation", {
                             "headers": {
                                 "accept": "application/json, text/plain, */*",
                                 "accept-language": "en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7",
@@ -81,7 +83,7 @@ function bookYosemite(username, accessToken, date) {
                             },
                             "referrer": "https://www.recreation.gov/timed-entry/10086745/ticket/10086746",
                             "referrerPolicy": "strict-origin-when-cross-origin",
-                            "body": JSON.stringify(body),
+                            "body": bodystr,
                             "method": "POST",
                             "mode": "cors"
                         })];
@@ -92,19 +94,48 @@ function bookYosemite(username, accessToken, date) {
                     res = _a.sent();
                     console.log(res);
                     if (res.error) {
-                        throw "Reservation error";
+                        console.log("Reservation error : " + res.error);
+                        return [2 /*return*/, false];
                     }
-                    return [2 /*return*/, false];
+                    return [2 /*return*/, true];
             }
         });
     });
 }
 exports.bookYosemite = bookYosemite;
 (function () { return __awaiter(void 0, void 0, void 0, function () {
-    var sleep_between_runs;
     return __generator(this, function (_a) {
-        sleep_between_runs = 10 * 60 * 1000;
-        return [2 /*return*/];
+        switch (_a.label) {
+            case 0: return [4 /*yield*/, mailgun_1.send(["xhuang@gmail.com"], "Yosemite reservation booked!", "Check your chart at: https://www.recreation.gov/")];
+            case 1:
+                _a.sent();
+                return [2 /*return*/];
+        }
     });
 }); })();
+// (async () => {
+//     let sleep_between_runs = 15000; // 15 second
+//     while (1) {
+//         let account = await login();
+//         try {
+//             let reservation = await bookYosemite(
+//                 account.email,
+//                 account.accessToken,
+//                 // "2021-07-27",
+//                 // "2021-06-09",
+//                 "2021-06-08",
+//             );
+//             if (reservation) {
+//                 console.log('******* reservation made;')
+//                 process.exit(0);
+//             }
+//             console.log(`.....  no reservation made, try again in ${sleep_between_runs / 1000} seconds`);
+//             await new Promise(r => setTimeout(r, sleep_between_runs));
+//         } catch (e) {
+//             console.log(e);
+//             // eat the error and try again in 10 seconds
+//             await new Promise(r => setTimeout(r, 10 * 1000));
+//         }
+//     }
+// })();
 //# sourceMappingURL=bookYosemite.js.map

@@ -1,9 +1,9 @@
-name: keepalive
+name: Yosemite-2021-07-16
 on: 
   workflow_dispatch:
   schedule:
-    # every 2 hours...
-    - cron: "0 */2 * * *"
+    # every 5 hours...
+    - cron: "0 */5 * * *"
 defaults:
   run:
     shell: bash
@@ -18,7 +18,7 @@ jobs:
       with:
           node-version: ${{ matrix.node-version }}
     - run: npm ci
-    - run: npx ts-node v2-keepalive.ts
+    - run: npx ts-node bookYosemite.ts 2021-07-16
       env:
           RECREATION_GOV_PASSWORD: ${{ secrets.RECREATION_GOV_PASSWORD }}
           RECREATION_GOV_USERNAME: ${{ secrets.RECREATION_GOV_USERNAME }}

@@ -10,6 +10,7 @@
   "keywords": [],
   "description": "",
   "dependencies": {
+    "mailgun-js": "^0.22.0",
     "moment": "^2.29.1",
     "node-fetch": "^2.6.1",
     "puppeteer": "^9.1.1",
