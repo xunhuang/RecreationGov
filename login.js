@@ -135,7 +135,6 @@ function login() {
                     account = AccountInfo.factory_from_cache();
                     if (account) {
                         console.log("got account from cache");
-                        console.log(account);
                         if (moment().add(6, "hours").isBefore(moment(account.expiration))) {
                             return [2 /*return*/, account];
                         }
