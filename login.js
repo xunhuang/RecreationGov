@@ -37,7 +37,9 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.login = void 0;
-var fetch = require('node-fetch');
+var fs = require("fs");
+var fetch = require("node-fetch");
+var moment = require("moment");
 var USERNAME = process.env.RECREATION_GOV_USERNAME;
 var PASSWORD = process.env.RECREATION_GOV_PASSWORD;
 if (!USERNAME || !PASSWORD) {
@@ -47,12 +49,34 @@ if (!USERNAME || !PASSWORD) {
     process.exit(-1);
 }
 var AccountInfo = /** @class */ (function () {
-    function AccountInfo(accessToken, email, accountId, expiration) {
-        this.accessToken = accessToken;
-        this.email = email;
-        this.accountId = accountId;
-        this.expiration = expiration;
+    function AccountInfo(data) {
+        Object.assign(this, data);
     }
+    AccountInfo.factory = function (accessToken, email, accountId, expiration) {
+        var data = {
+            accessToken: accessToken,
+            email: email,
+            accountId: accountId,
+            expiration: expiration,
+        };
+        return new AccountInfo(data);
+    };
+    AccountInfo.prototype.persistToFileSystem = function () {
+        var data = Object.assign({}, this);
+        var jsondata = JSON.stringify(data);
+        fs.writeFileSync('.account.json', jsondata);
+    };
+    AccountInfo.factory_from_cache = function () {
+        try {
+            var rawdata = fs.readFileSync('.account.json', 'utf8');
+            var data = JSON.parse(rawdata);
+            return new AccountInfo(data);
+        }
+        catch (e) {
+            console.log(e);
+        }
+        return null;
+    };
     return AccountInfo;
 }());
 ;
@@ -90,7 +114,7 @@ function api_login(username, password) {
                     if (res.error) {
                         throw "Login error";
                     }
-                    account = new AccountInfo(res.access_token, res.account.email, res.account.account_id, res.expiration);
+                    account = AccountInfo.factory(res.access_token, res.account.email, res.account.account_id, res.expiration);
                     return [2 /*return*/, account];
                 case 3:
                     e_1 = _a.sent();
@@ -104,10 +128,28 @@ function api_login(username, password) {
 ;
 function login() {
     return __awaiter(this, void 0, void 0, function () {
+        var account;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, api_login(USERNAME, PASSWORD)];
-                case 1: return [2 /*return*/, _a.sent()];
+                case 0:
+                    account = AccountInfo.factory_from_cache();
+                    if (account) {
+                        console.log("got account from cache");
+                        console.log(account);
+                        if (moment().add(6, "hours").isBefore(moment(account.expiration))) {
+                            return [2 /*return*/, account];
+                        }
+                        console.log("cache expired");
+                    }
+                    return [4 /*yield*/, api_login(USERNAME, PASSWORD)];
+                case 1:
+                    account = _a.sent();
+                    if (account) {
+                        console.log("persisting new login to file");
+                        account.persistToFileSystem();
+                    }
+                    // console.log(account);
+                    return [2 /*return*/, account];
             }
         });
     });

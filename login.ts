@@ -1,5 +1,7 @@
 
-const fetch = require('node-fetch');
+import fs = require('fs');
+import fetch = require('node-fetch');
+import moment = require("moment");
 
 const USERNAME = process.env.RECREATION_GOV_USERNAME;
 const PASSWORD = process.env.RECREATION_GOV_PASSWORD;
@@ -17,15 +19,40 @@ class AccountInfo {
     public accountId: string;
     public expiration: string;
 
-    constructor(
+    static factory(
         accessToken: string,
         email: string,
         accountId: string,
         expiration: string) {
-        this.accessToken = accessToken;
-        this.email = email;
-        this.accountId = accountId;
-        this.expiration = expiration;
+
+        let data = {
+            accessToken: accessToken,
+            email: email,
+            accountId: accountId,
+            expiration: expiration,
+        }
+        return new AccountInfo(data);
+    }
+
+    constructor(data) {
+        Object.assign(this, data);
+    }
+
+    persistToFileSystem() {
+        let data = Object.assign({}, this);
+        let jsondata = JSON.stringify(data);
+        fs.writeFileSync('.account.json', jsondata);
+    }
+
+    static factory_from_cache(): AccountInfo | null {
+        try {
+            let rawdata = fs.readFileSync('.account.json', 'utf8');
+            let data = JSON.parse(rawdata);
+            return new AccountInfo(data);
+        } catch (e) {
+            console.log(e);
+        }
+        return null;
     }
 };
 
@@ -54,7 +81,7 @@ async function api_login(username: string, password: string): Promise<AccountInf
         if (res.error) {
             throw "Login error";
         }
-        let account = new AccountInfo(
+        let account = AccountInfo.factory(
             res.access_token,
             res.account.email,
             res.account.account_id,
@@ -68,5 +95,20 @@ async function api_login(username: string, password: string): Promise<AccountInf
 };
 
 export async function login(): Promise<AccountInfo | null> {
-    return await api_login(USERNAME, PASSWORD);
+    let account = AccountInfo.factory_from_cache();
+    if (account) {
+        console.log("got account from cache");
+        console.log(account)
+        if (moment().add(6, "hours").isBefore(moment(account.expiration))) {
+            return account;
+        }
+        console.log("cache expired");
+    }
+    account = await api_login(USERNAME, PASSWORD);
+    if (account) {
+        console.log("persisting new login to file");
+        account.persistToFileSystem();
+    }
+    // console.log(account);
+    return account;
 }
