@@ -86,5 +86,6 @@ export async function bookYosemite(username: string, accessToken: string, date: 
             // eat the error and try again in 10 seconds
             await new Promise(r => setTimeout(r, 10 * 1000));
         }
+        break;
     }
 })();
