@@ -36,9 +36,49 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.bookYosemite = void 0;
+exports.bookYosemite = exports.isDateAvailable = void 0;
+var moment = require("moment");
+var login_1 = require("./login");
 var fetch = require("node-fetch");
 var mailgun_1 = require("./mailgun");
+function isDateAvailable(accessToken, date) {
+    return __awaiter(this, void 0, void 0, function () {
+        var d, response, res;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    d = moment(date, "YYYY-MM-DD");
+                    return [4 /*yield*/, fetch("https://www.recreation.gov/api/timedentry/availability/facility/10086745/monthlyAvailabilitySummaryView?year=" + d.format("YYYY") + "&month=" + d.format("MM") + "&inventoryBucket=FIT", {
+                            "headers": {
+                                "accept": "*/*",
+                                "accept-language": "en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7",
+                                "sec-ch-ua": "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"90\", \"Google Chrome\";v=\"90\"",
+                                "sec-ch-ua-mobile": "?0",
+                                "sec-fetch-dest": "empty",
+                                "sec-fetch-mode": "cors",
+                                "sec-fetch-site": "same-origin",
+                            },
+                            "referrer": "https://www.recreation.gov/timed-entry/10086745/ticket/10086746",
+                            "referrerPolicy": "strict-origin-when-cross-origin",
+                            "body": null,
+                            "method": "GET",
+                            "mode": "cors"
+                        })];
+                case 1:
+                    response = _a.sent();
+                    return [4 /*yield*/, response.json()];
+                case 2:
+                    res = _a.sent();
+                    if (res.error) {
+                        console.log("Reservation error : " + res.error);
+                        return [2 /*return*/, false];
+                    }
+                    return [2 /*return*/, res["facility_availability_summary_view_by_local_date"][date]["tour_availability_summary_view_by_tour_id"]['10086746']["has_reservable"]];
+            }
+        });
+    });
+}
+exports.isDateAvailable = isDateAvailable;
 function bookYosemite(username, accessToken, date) {
     return __awaiter(this, void 0, void 0, function () {
         var body, bodystr, response, res;
@@ -92,7 +132,6 @@ function bookYosemite(username, accessToken, date) {
                     return [4 /*yield*/, response.json()];
                 case 2:
                     res = _a.sent();
-                    console.log(res);
                     if (res.error) {
                         console.log("Reservation error : " + res.error);
                         return [2 /*return*/, false];
@@ -104,38 +143,54 @@ function bookYosemite(username, accessToken, date) {
 }
 exports.bookYosemite = bookYosemite;
 (function () { return __awaiter(void 0, void 0, void 0, function () {
+    var date, sleep_between_runs, account, avail, reservation, e_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, mailgun_1.send(["xhuang@gmail.com"], "Yosemite reservation booked!", "Check your chart at: https://www.recreation.gov/")];
+            case 0:
+                date = process.argv[2];
+                sleep_between_runs = 15000;
+                _a.label = 1;
             case 1:
+                if (!1) return [3 /*break*/, 12];
+                return [4 /*yield*/, login_1.login()];
+            case 2:
+                account = _a.sent();
+                _a.label = 3;
+            case 3:
+                _a.trys.push([3, 9, , 11]);
+                return [4 /*yield*/, isDateAvailable(account.accessToken, date)];
+            case 4:
+                avail = _a.sent();
+                if (!avail) return [3 /*break*/, 7];
+                console.log('Slots availalbe. Make actual booking....');
+                return [4 /*yield*/, bookYosemite(account.email, account.accessToken, date)];
+            case 5:
+                reservation = _a.sent();
+                if (!reservation) return [3 /*break*/, 7];
+                console.log('******* reservation made;');
+                return [4 /*yield*/, mailgun_1.send(["xhuang@gmail.com"], date + " Yosemite reservation is added to chart!", "Check your chart at: https://www.recreation.gov/ and checkout ASAP.")];
+            case 6:
                 _a.sent();
-                return [2 /*return*/];
+                process.exit(0);
+                _a.label = 7;
+            case 7:
+                console.log(".....  no reservation made, try again in " + sleep_between_runs / 1000 + " seconds");
+                return [4 /*yield*/, new Promise(function (r) { return setTimeout(r, sleep_between_runs); })];
+            case 8:
+                _a.sent();
+                return [3 /*break*/, 11];
+            case 9:
+                e_1 = _a.sent();
+                console.log(e_1);
+                // eat the error and try again in 10 seconds
+                return [4 /*yield*/, new Promise(function (r) { return setTimeout(r, 10 * 1000); })];
+            case 10:
+                // eat the error and try again in 10 seconds
+                _a.sent();
+                return [3 /*break*/, 11];
+            case 11: return [3 /*break*/, 1];
+            case 12: return [2 /*return*/];
         }
     });
 }); })();
-// (async () => {
-//     let sleep_between_runs = 15000; // 15 second
-//     while (1) {
-//         let account = await login();
-//         try {
-//             let reservation = await bookYosemite(
-//                 account.email,
-//                 account.accessToken,
-//                 // "2021-07-27",
-//                 // "2021-06-09",
-//                 "2021-06-08",
-//             );
-//             if (reservation) {
-//                 console.log('******* reservation made;')
-//                 process.exit(0);
-//             }
-//             console.log(`.....  no reservation made, try again in ${sleep_between_runs / 1000} seconds`);
-//             await new Promise(r => setTimeout(r, sleep_between_runs));
-//         } catch (e) {
-//             console.log(e);
-//             // eat the error and try again in 10 seconds
-//             await new Promise(r => setTimeout(r, 10 * 1000));
-//         }
-//     }
-// })();
 //# sourceMappingURL=bookYosemite.js.map

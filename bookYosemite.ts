@@ -4,6 +4,33 @@ import { login } from "./login";
 import fetch = require('node-fetch');
 import { send } from "./mailgun";
 
+export async function isDateAvailable(accessToken: string, date: string): Promise<boolean> {
+    let d = moment(date, "YYYY-MM-DD");
+    let response = await fetch(`https://www.recreation.gov/api/timedentry/availability/facility/10086745/monthlyAvailabilitySummaryView?year=${d.format("YYYY")}&month=${d.format("MM")}&inventoryBucket=FIT`, {
+        "headers": {
+            "accept": "*/*",
+            "accept-language": "en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7",
+            "sec-ch-ua": "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"90\", \"Google Chrome\";v=\"90\"",
+            "sec-ch-ua-mobile": "?0",
+            "sec-fetch-dest": "empty",
+            "sec-fetch-mode": "cors",
+            "sec-fetch-site": "same-origin",
+        },
+        "referrer": "https://www.recreation.gov/timed-entry/10086745/ticket/10086746",
+        "referrerPolicy": "strict-origin-when-cross-origin",
+        "body": null,
+        "method": "GET",
+        "mode": "cors"
+    });
+    let res = await response.json();
+    if (res.error) {
+        console.log(`Reservation error : ${res.error}`);
+        return false;
+    }
+    return res["facility_availability_summary_view_by_local_date"][date]["tour_availability_summary_view_by_tour_id"]['10086746']["has_reservable"];
+}
+
+
 export async function bookYosemite(username: string, accessToken: string, date: string): Promise<boolean> {
     let body = {
         "reservation": {
@@ -50,7 +77,6 @@ export async function bookYosemite(username: string, accessToken: string, date: 
         "mode": "cors"
     });
     let res = await response.json();
-    console.log(res);
     if (res.error) {
         console.log(`Reservation error : ${res.error}`);
         return false;
@@ -64,20 +90,24 @@ export async function bookYosemite(username: string, accessToken: string, date: 
     while (1) {
         let account = await login();
         try {
-            let reservation = await bookYosemite(
-                account.email,
-                account.accessToken,
-                date,
-            );
-            if (reservation) {
-                console.log('******* reservation made;')
+            let avail = await isDateAvailable(account.accessToken, date);
+            if (avail) {
+                console.log('Slots availalbe. Make actual booking....')
+                // continue;
+                let reservation = await bookYosemite(
+                    account.email,
+                    account.accessToken,
+                    date,
+                );
+                if (reservation) {
+                    console.log('******* reservation made;')
+                    await send(
+                        ["xhuang@gmail.com"],
+                        `${date} Yosemite reservation is added to chart!`,
+                        "Check your chart at: https://www.recreation.gov/ and checkout ASAP.")
 
-                await send(
-                    ["xhuang@gmail.com"],
-                    `${date} Yosemite reservation is added to chart!`,
-                    "Check your chart at: https://www.recreation.gov/ and checkout ASAP.")
-
-                process.exit(0);
+                    process.exit(0);
+                }
             }
             console.log(`.....  no reservation made, try again in ${sleep_between_runs / 1000} seconds`);
             await new Promise(r => setTimeout(r, sleep_between_runs));
