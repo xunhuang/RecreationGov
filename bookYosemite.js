@@ -148,7 +148,7 @@ exports.bookYosemite = bookYosemite;
         switch (_a.label) {
             case 0:
                 date = process.argv[2];
-                sleep_between_runs = 15000;
+                sleep_between_runs = 300000;
                 _a.label = 1;
             case 1:
                 if (!1) return [3 /*break*/, 12];

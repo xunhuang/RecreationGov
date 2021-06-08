@@ -86,7 +86,7 @@ export async function bookYosemite(username: string, accessToken: string, date: 
 
 (async () => {
     let date = process.argv[2];
-    let sleep_between_runs = 15000; // 15 second
+    let sleep_between_runs = 300000; // 300 second
     while (1) {
         let account = await login();
         try {
