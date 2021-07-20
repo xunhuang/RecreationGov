@@ -6,8 +6,8 @@ import { shopperCart } from "./cartHeader"
 
 (async () => {
     let sleep_between_runs = 10 * 60 * 1000; // 10 minutes;
-    // let sleep_between_runs = 3000; // 3 second
-    while (1) {
+    let end_time = moment().add(6, "hours"); // github action time limit
+    while (moment().add(sleep_between_runs * 2).isBefore(end_time)) {
         let account = await login();
         try {
             let cart = await shopperCart(account.accessToken);
